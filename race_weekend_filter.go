@@ -1,5 +1,6 @@
 package servermanager
 
+<<<<<<< HEAD
 import (
 	"fmt"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+=======
+>>>>>>> origin/multiserver2
 type FilterError string
 
 func (f FilterError) Error() string {
@@ -16,6 +19,7 @@ func (f FilterError) Error() string {
 }
 
 type RaceWeekendSessionToSessionFilter struct {
+<<<<<<< HEAD
 	// IsPreview indicates that the Filter is for preview only, and will not actually affect a starting grid.
 	IsPreview bool
 
@@ -45,6 +49,16 @@ type RaceWeekendSessionToSessionFilter struct {
 
 	// SelectedDriverGUIDs is a list of the currently selected driver GUIDs.
 	SelectedDriverGUIDs []string
+=======
+	ResultStart int
+	ResultEnd   int
+
+	NumEntrantsToReverse int
+
+	EntryListStart int
+
+	SortType string
+>>>>>>> origin/multiserver2
 }
 
 func reverseEntrants(numToReverse int, entrants []*RaceWeekendSessionEntrant) {
@@ -75,18 +89,28 @@ func reverseEntrants(numToReverse int, entrants []*RaceWeekendSessionEntrant) {
 }
 
 // Filter takes a set of RaceWeekendSessionEntrants formed by the results of the parent session and filters them into a child session entry list.
+<<<<<<< HEAD
 func (f RaceWeekendSessionToSessionFilter) Filter(raceWeekend *RaceWeekend, parentSession, childSession *RaceWeekendSession, parentSessionResults []*RaceWeekendSessionEntrant, childSessionEntryList *RaceWeekendEntryList) error {
 	if parentSession.Completed() || childSession.IsBase() {
+=======
+func (f RaceWeekendSessionToSessionFilter) Filter(parentSession, childSession *RaceWeekendSession, parentSessionResults []*RaceWeekendSessionEntrant, childSessionEntryList *RaceWeekendEntryList) error {
+	if parentSession.Completed() {
+>>>>>>> origin/multiserver2
 		sorter := GetRaceWeekendEntryListSort(f.SortType)
 
 		parentSession.NumEntrantsToReverse = f.NumEntrantsToReverse
 
 		// race weekend session is completed and has a valid sorter, use it to sort results before filtering.
+<<<<<<< HEAD
 		if err := sorter.Sort(raceWeekend, parentSession, parentSessionResults, &f); err != nil {
+=======
+		if err := sorter(parentSession, parentSessionResults); err != nil {
+>>>>>>> origin/multiserver2
 			return err
 		}
 	}
 
+<<<<<<< HEAD
 	entryListStart := f.EntryListStart - 1
 
 	var split []*RaceWeekendSessionEntrant
@@ -116,12 +140,30 @@ func (f RaceWeekendSessionToSessionFilter) Filter(raceWeekend *RaceWeekend, pare
 		split = parentSessionResults[resultStart:resultEnd]
 	}
 
+=======
+	resultStart, resultEnd, entryListStart := f.ResultStart, f.ResultEnd, f.EntryListStart
+
+	resultStart--
+	entryListStart--
+
+	if resultStart > len(parentSessionResults) {
+		return nil
+	}
+
+	if resultEnd > len(parentSessionResults) {
+		resultEnd = len(parentSessionResults)
+	}
+
+	split := parentSessionResults[resultStart:resultEnd]
+
+>>>>>>> origin/multiserver2
 	if !parentSession.Completed() {
 		reverseEntrants(f.NumEntrantsToReverse, split)
 	}
 
 	splitIndex := 0
 
+<<<<<<< HEAD
 	for pitBox := entryListStart; pitBox < entryListStart+len(split); pitBox++ {
 		entrant := split[splitIndex]
 		entrant.SessionID = parentSession.ID
@@ -141,6 +183,12 @@ func (f RaceWeekendSessionToSessionFilter) Filter(raceWeekend *RaceWeekend, pare
 			}
 		}
 
+=======
+	for pitBox := entryListStart; pitBox < entryListStart+(resultEnd-resultStart); pitBox++ {
+		entrant := split[splitIndex]
+		entrant.SessionID = parentSession.ID
+
+>>>>>>> origin/multiserver2
 		childSessionEntryList.AddInPitBox(entrant, pitBox)
 
 		splitIndex++
@@ -148,6 +196,7 @@ func (f RaceWeekendSessionToSessionFilter) Filter(raceWeekend *RaceWeekend, pare
 
 	return nil
 }
+<<<<<<< HEAD
 
 const lockedTyreSetupFolder = "server_manager_locked_tyres"
 
@@ -246,3 +295,5 @@ func (rw *RaceWeekend) buildLockedTyreSetup(session *RaceWeekendSession, entrant
 
 	return nil
 }
+=======
+>>>>>>> origin/multiserver2

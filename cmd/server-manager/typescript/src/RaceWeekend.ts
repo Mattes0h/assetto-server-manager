@@ -2,7 +2,10 @@ import ChangeEvent = JQuery.ChangeEvent;
 import {Connection, jsPlumb, jsPlumbInstance} from "jsplumb";
 import dagre, {graphlib} from "dagre";
 import {initMultiSelect} from "./javascript/manager";
+<<<<<<< HEAD
 import ClickEvent = JQuery.ClickEvent;
+=======
+>>>>>>> origin/multiserver2
 
 declare var RaceWeekendID: string;
 declare var IsEditing: boolean;
@@ -57,9 +60,12 @@ export namespace RaceWeekend {
 
                     $elem.val($elem.data("default-value"));
                 });
+<<<<<<< HEAD
 
                 // set wait time for races to be a large number
                 $("#Race\\.WaitTime").val(300);
+=======
+>>>>>>> origin/multiserver2
             }
         }
     }
@@ -77,8 +83,11 @@ export namespace RaceWeekend {
 
             $(".view-results").on("click", this.onViewResultsClick);
             $(".manage-entrylist").on("click", this.openManageEntryListModal);
+<<<<<<< HEAD
 
             this.initSessionDetailsButtons();
+=======
+>>>>>>> origin/multiserver2
         }
 
         private initJsPlumb(): void {
@@ -218,6 +227,7 @@ export namespace RaceWeekend {
                 $results.collapse('show');
             });
         }
+<<<<<<< HEAD
 
         private initSessionDetailsButtons(): void {
             $(document).on("click", ".race-weekend-session-details", (e: ClickEvent) => {
@@ -236,6 +246,8 @@ export namespace RaceWeekend {
                 return false;
             });
         }
+=======
+>>>>>>> origin/multiserver2
     }
 
     /**
@@ -274,7 +286,11 @@ export namespace RaceWeekend {
             }
 
             if (pos !== undefined) {
+<<<<<<< HEAD
                 $td.text(`${pos + 1}. ${entrant.Name}`);
+=======
+                $td.text(`${pos+1}. ${entrant.Name}`);
+>>>>>>> origin/multiserver2
             } else {
                 $td.text(entrant.Name);
             }
@@ -311,10 +327,13 @@ export namespace RaceWeekend {
         private reverseGrid: number = 0;
         private gridStart!: number;
         private sortType!: string;
+<<<<<<< HEAD
         private availableResultsForSorting: string[] = [];
         private startOnFastestLapTyre: boolean = false;
         private manualDriverSelection: boolean = false;
         private selectedDriverGUIDs: string[] = [];
+=======
+>>>>>>> origin/multiserver2
 
         public constructor($elem: JQuery<HTMLElement>, parentSessionID: string, childSessionID: string) {
             super($elem);
@@ -333,10 +352,13 @@ export namespace RaceWeekend {
                 NumEntrantsToReverse: this.reverseGrid,
                 EntryListStart: this.gridStart,
                 SortType: this.sortType,
+<<<<<<< HEAD
                 ForceUseTyreFromFastestLap: this.startOnFastestLapTyre,
                 AvailableResultsForSorting: this.availableResultsForSorting,
                 ManualDriverSelection: this.manualDriverSelection,
                 SelectedDriverGUIDs: this.selectedDriverGUIDs,
+=======
+>>>>>>> origin/multiserver2
             })
         }
 
@@ -346,6 +368,7 @@ export namespace RaceWeekend {
             this.reverseGrid = parseInt(this.$elem.find("#ReverseGrid").val() as string);
             this.gridStart = parseInt(this.$elem.find("#GridStart").val() as string);
             this.sortType = this.$elem.find("#ResultsSort").val() as string;
+<<<<<<< HEAD
             this.availableResultsForSorting = this.$elem.find("#AvailableResults").val() as string[];
             this.startOnFastestLapTyre = this.$elem.find("#ForceUseTyreFromFastestLap").is(":checked");
 
@@ -369,6 +392,8 @@ export namespace RaceWeekend {
                 this.$elem.find("#DriverSelectionForm").hide();
                 this.$elem.find("#FilterFromTo").show();
             }
+=======
+>>>>>>> origin/multiserver2
 
             $.ajax(`/race-weekend/${RaceWeekendID}/grid-preview?parentSessionID=${this.parentSessionID}&childSessionID=${this.childSessionID}`, {
                 data: this.packageValues(),
@@ -391,6 +416,7 @@ export namespace RaceWeekend {
                 $table.find("tr:not(:first-child)").remove();
                 this.buildClassKey(response.Classes);
 
+<<<<<<< HEAD
                 for (let i = 0; i < Math.max(grid.length, results.length); i++) {
                     let $row = $("<tr>");
 
@@ -399,6 +425,11 @@ export namespace RaceWeekend {
                     } else {
                         $row.append($("<td>"));
                     }
+=======
+                for (let i = 0; i < grid.length || i < results.length; i++) {
+                    let $row = $("<tr>");
+                    $row.append(this.buildTableDataForEntrant(results[i], i));
+>>>>>>> origin/multiserver2
 
                     if (i < grid.length) {
                         $row.append(this.buildTableDataForEntrant(grid[i], i));

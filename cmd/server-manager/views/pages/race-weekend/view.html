@@ -1,11 +1,18 @@
+<<<<<<< HEAD
 {{/* gotype: github.com/JustaPenguin/assetto-server-manager.raceWeekendViewTemplateVars */}}
+=======
+{{/* gotype: github.com/cj123/assetto-server-manager.raceWeekendViewTemplateVars */}}
+>>>>>>> origin/multiserver2
 
 {{ define "title" }}{{ $.RaceWeekend.Name }} Race Weekend{{ end }}
 
 {{ define "content" }}
 
+<<<<<<< HEAD
     {{ $serverID := $.ServerID }}
 
+=======
+>>>>>>> origin/multiserver2
     <div class="container">
 
         <h1 class="text-center">{{ $.RaceWeekend.Name }}</h1>
@@ -25,8 +32,11 @@
             </div>
         {{ end }}
 
+<<<<<<< HEAD
         {{ template "raceweekend-premium" dict "IsPremium" $.IsPremium }}
 
+=======
+>>>>>>> origin/multiserver2
         {{ if not $.RaceWeekend.HasLinkedChampionship }}
             <h2>Entrants</h2>
 
@@ -61,7 +71,11 @@
 
         <div class="float-right">
             {{ if $.RaceWeekend.HasLinkedChampionship }}
+<<<<<<< HEAD
                 <a class="btn btn-info" href="/championship/{{ $.RaceWeekend.Championship.ID.String }}">View Championship</a>
+=======
+                <a class="btn btn-primary" href="/championship/{{ $.RaceWeekend.Championship.ID.String }}">View Championship</a>
+>>>>>>> origin/multiserver2
             {{ end }}
 
             {{ if WriteAccess }}
@@ -127,10 +141,13 @@
                         <div class="float-right">
                             {{ if ne $acSession.Time 0 }}
                                 {{ $acSession.Time }} minutes
+<<<<<<< HEAD
 
                                 {{ if $session.RaceConfig.RaceExtraLap }}
                                     + 1 lap
                                 {{ end }}
+=======
+>>>>>>> origin/multiserver2
                             {{ else }}
                                 {{ with $acSession.Laps }}
                                     {{ . }} laps
@@ -144,9 +161,15 @@
                                     Not available
                                 </span>
                             {{ else if $session.Completed }}
+<<<<<<< HEAD
                                 <span class="text-success" data-toggle="tooltip" title="Completed on {{ fullTimeFormat $session.CompletedTime }}">Complete</span>
                             {{ else if $session.InProgress }}
                                 <span class="text-primary">In Progress</span>
+=======
+                                <span class="text-success">Complete</span>
+                            {{ else if $session.InProgress }}
+                                <span class="text-info">In Progress</span>
+>>>>>>> origin/multiserver2
                             {{ else }}
                                 <span class="text-warning">Ready to Start</span>
                             {{ end }}
@@ -161,6 +184,7 @@
                                 {{ else }}
                                     {{ prettify $raceConfig.Track false }} {{ with $raceConfig.TrackLayout }}({{ prettify . true }}){{ end }}
                                 {{ end }}
+<<<<<<< HEAD
 
                                 <br>
 
@@ -175,6 +199,8 @@
                                         for {{ localFormat $session.ScheduledTime }}
                                     </span><br>
                                 {{ end }}
+=======
+>>>>>>> origin/multiserver2
                             </div>
 
                             <div class="col-4">
@@ -185,14 +211,20 @@
                             </div>
                         </div>
 
+<<<<<<< HEAD
 
 
                         {{ if $session.Completed }}
                             <a class="btn btn-primary btn-sm view-results" href="#">View Results</a>
+=======
+                        {{ if $session.Completed }}
+                            <a class="btn btn-primary view-results" href="#">View Results</a>
+>>>>>>> origin/multiserver2
                         {{ end }}
 
                         {{ if WriteAccess }}
                             {{ if not (or $session.InProgress $session.Completed) }}
+<<<<<<< HEAD
                                 {{ if $.IsPremium }}
                                     {{ if $.RaceWeekend.SessionCanBeRun $session }}
                                         <div class="btn-group btn-group-sm">
@@ -279,17 +311,38 @@
                             {{ else if $session.InProgress }}
                                 <a onClick="return confirm('I understand that this will restart this entire session and any current results will be lost.') "
                                    class="btn btn-warning btn-sm" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/restart">
+=======
+                                {{ if $.RaceWeekend.SessionCanBeRun $session }}
+                                    <a class="btn btn-success" onClick="return confirm('I have checked all Entry List configurations and the starting grid is correct');" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/start">Start Session</a>
+                                {{ end }}
+
+
+                                {{ if not ($session.HasParent $.RaceWeekend.ID.String) }}
+                                    <a class="btn btn-primary manage-entrylist" href="#">Manage Entry List</a>
+                                {{ end }}
+                            {{ else if $session.InProgress }}
+                                <a onClick="return confirm('I understand that this will restart this entire session and any current results will be lost.') "
+                                   class="btn btn-warning" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/restart">
+>>>>>>> origin/multiserver2
                                     Restart Session
                                 </a>
 
                                 <a onClick="return confirm('I understand that this will cancel this entire session and any current results will be lost.') "
+<<<<<<< HEAD
                                    class="btn btn-danger btn-sm" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/cancel">
+=======
+                                   class="btn btn-danger" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/cancel">
+>>>>>>> origin/multiserver2
                                     Cancel Session
                                 </a>
                             {{ end }}
 
                             <div class="dropdown show d-inline-block">
+<<<<<<< HEAD
                                 <a class="btn btn-warning dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+=======
+                                <a class="btn btn-warning dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+>>>>>>> origin/multiserver2
                                     Manage Session
                                 </a>
 
@@ -298,6 +351,7 @@
                                         Edit
                                     </a>
 
+<<<<<<< HEAD
                                     {{ if $.IsPremium }}
                                         <a class="dropdown-item" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/import">
                                             Import Results
@@ -312,6 +366,11 @@
                                             Session Details
                                         </a>
                                     {{ end }}
+=======
+                                    <a class="dropdown-item" href="/race-weekend/{{ $.RaceWeekend.ID.String }}/session/{{ $session.ID.String }}/import">
+                                        Import Results
+                                    </a>
+>>>>>>> origin/multiserver2
 
                                     {{ if DeleteAccess }}
                                         <a onClick="return confirm('I understand that this will delete this entire session permanently.') "
@@ -322,6 +381,7 @@
                                 </div>
                             </div>
                         {{ else }}
+<<<<<<< HEAD
                             <a class="btn btn-secondary manage-entrylist btn-sm" href="#">View Entry List</a>
                         {{ end }}
 
@@ -332,6 +392,9 @@
                             >
                                 Session Details
                             </a>
+=======
+                            <a class="btn btn-secondary manage-entrylist" href="#">View Entry List</a>
+>>>>>>> origin/multiserver2
                         {{ end }}
                     </div>
                 </div>
@@ -365,10 +428,13 @@
                             <div class="float-right">
                                 {{ if ne $acSession.Time 0 }}
                                     {{ $acSession.Time }} minutes
+<<<<<<< HEAD
 
                                     {{ if $session.RaceConfig.RaceExtraLap }}
                                         + 1 lap
                                     {{ end }}
+=======
+>>>>>>> origin/multiserver2
                                 {{ else }}
                                     {{ with $acSession.Laps }}
                                         {{ . }} laps
@@ -382,9 +448,15 @@
                                             Not available
                                         </span>
                                 {{ else if $session.Completed }}
+<<<<<<< HEAD
                                     <span class="text-success">Completed on {{ localFormat $session.CompletedTime }}</span>
                                 {{ else if $session.InProgress }}
                                     <span class="text-primary">In Progress</span>
+=======
+                                    <span class="text-success">Complete</span>
+                                {{ else if $session.InProgress }}
+                                    <span class="text-info">In Progress</span>
+>>>>>>> origin/multiserver2
                                 {{ else }}
                                     <span class="text-warning">Ready to Start</span>
                                 {{ end }}
@@ -488,9 +560,12 @@
         <!-- content controlled by js -->
     </div>
 
+<<<<<<< HEAD
     <div class="modal" tabindex="-1" role="dialog" id="session-details-modal">
         <!-- content controlled by js -->
     </div>
+=======
+>>>>>>> origin/multiserver2
 
     <script type="text/javascript">
         var RaceWeekendID = {{ $.RaceWeekend.ID.String }};

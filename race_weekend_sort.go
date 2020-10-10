@@ -9,6 +9,7 @@ import (
 )
 
 // RaceWeekendEntryListSorter is a function which takes a race weekend, session and entrylist and sorts the entrylist based on some criteria.
+<<<<<<< HEAD
 type RaceWeekendEntryListSorter interface {
 	Sort(*RaceWeekend, *RaceWeekendSession, []*RaceWeekendSessionEntrant, *RaceWeekendSessionToSessionFilter) error
 }
@@ -26,10 +27,19 @@ type RaceWeekendEntryListSortFunc func(*RaceWeekend, *RaceWeekendSession, []*Rac
 
 func (rwelsf RaceWeekendEntryListSortFunc) Sort(rw *RaceWeekend, rws *RaceWeekendSession, rwes []*RaceWeekendSessionEntrant, rwsf *RaceWeekendSessionToSessionFilter) error {
 	return rwelsf(rw, rws, rwes, rwsf)
+=======
+type RaceWeekendEntryListSorter func(*RaceWeekendSession, []*RaceWeekendSessionEntrant) error
+
+type RaceWeekendEntryListSorterDescription struct {
+	Name     string
+	Key      string
+	SortFunc RaceWeekendEntryListSorter
+>>>>>>> origin/multiserver2
 }
 
 var RaceWeekendEntryListSorters = []RaceWeekendEntryListSorterDescription{
 	{
+<<<<<<< HEAD
 		Name:                  "No Sort (Use Finishing Grid)",
 		Key:                   "", // key intentionally left blank
 		Sorter:                RaceWeekendEntryListSortFunc(UnchangedRaceWeekendEntryListSort),
@@ -124,12 +134,53 @@ var RaceWeekendEntryListSorters = []RaceWeekendEntryListSorterDescription{
 		NeedsParentSession:    false,
 		NeedsChampionship:     false,
 		ShowInManageEntryList: true,
+=======
+		Name:     "No Sort (Use Finishing Grid)",
+		Key:      "", // key intentionally left blank
+		SortFunc: UnchangedRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Fastest Lap",
+		Key:      "fastest_lap",
+		SortFunc: FastestLapRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Total Race Time",
+		Key:      "total_race_time",
+		SortFunc: TotalRaceTimeRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Fewest Collisions",
+		Key:      "fewest_collisions",
+		SortFunc: FewestCollisionsRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Fewest Cuts",
+		Key:      "fewest_cuts",
+		SortFunc: FewestCutsRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Safety (Collisions then Cuts)",
+		Key:      "safety",
+		SortFunc: SafetyRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Random",
+		Key:      "random",
+		SortFunc: RandomRaceWeekendEntryListSort,
+	},
+	{
+		Name:     "Alphabetical (Using Driver Name)",
+		Key:      "alphabetical",
+		SortFunc: AlphabeticalRaceWeekendEntryListSort,
+>>>>>>> origin/multiserver2
 	},
 }
 
 func GetRaceWeekendEntryListSort(key string) RaceWeekendEntryListSorter {
 	for _, sorter := range RaceWeekendEntryListSorters {
 		if sorter.Key == key {
+<<<<<<< HEAD
 			return PerClassSort(sorter.Sorter)
 		}
 	}
@@ -145,12 +196,26 @@ func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter 
 		}
 
 		classMap := make(map[uuid.UUID]bool)
+=======
+			return PerClassSort(sorter.SortFunc)
+		}
+	}
+
+	return PerClassSort(UnchangedRaceWeekendEntryListSort)
+}
+
+func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter {
+	return func(session *RaceWeekendSession, allEntrants []*RaceWeekendSessionEntrant) error {
+>>>>>>> origin/multiserver2
 		fastestLapForClass := make(map[uuid.UUID]int)
 		entrantsForClass := make(map[uuid.UUID][]*RaceWeekendSessionEntrant)
 
 		for _, entrant := range allEntrants {
+<<<<<<< HEAD
 			classMap[entrant.EntrantResult.ClassID] = true
 
+=======
+>>>>>>> origin/multiserver2
 			fastestLap, ok := fastestLapForClass[entrant.EntrantResult.ClassID]
 
 			if entrant.EntrantResult.BestLap > 0 {
@@ -164,6 +229,7 @@ func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter 
 
 		var classes []uuid.UUID
 
+<<<<<<< HEAD
 		for class := range classMap {
 			classes = append(classes, class)
 		}
@@ -180,13 +246,27 @@ func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter 
 				return classes[i].String() < classes[j].String()
 			})
 		}
+=======
+		for class := range fastestLapForClass {
+			classes = append(classes, class)
+		}
+
+		// sort each class by the fastest lap in that class
+		sort.Slice(classes, func(i, j int) bool {
+			return fastestLapForClass[classes[i]] < fastestLapForClass[classes[j]]
+		})
+>>>>>>> origin/multiserver2
 
 		lastStartPos := 0
 
 		for _, class := range classes {
 			entrants := entrantsForClass[class]
 
+<<<<<<< HEAD
 			err := sorter.Sort(rw, session, entrants, filter)
+=======
+			err := sorter(session, entrants)
+>>>>>>> origin/multiserver2
 
 			if err != nil {
 				return err
@@ -194,11 +274,15 @@ func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter 
 
 			reverseEntrants(session.NumEntrantsToReverse, entrants)
 
+<<<<<<< HEAD
 			if _, isChampionshipOrderSort := sorter.(*ChampionshipStandingsOrderEntryListSort); isChampionshipOrderSort && rw.HasLinkedChampionship() && rw.Championship != nil {
 				sortDriversWithNoChampionshipRacesToBackOfGrid(rw.Championship, entrants)
 			} else {
 				sortDriversWithNoTimeToBackOfGrid(entrants)
 			}
+=======
+			sortDriversWithNoTimeToBackOfGrid(entrants)
+>>>>>>> origin/multiserver2
 
 			for index, entrant := range entrants {
 				allEntrants[lastStartPos+index] = entrant
@@ -208,7 +292,11 @@ func PerClassSort(sorter RaceWeekendEntryListSorter) RaceWeekendEntryListSorter 
 		}
 
 		return nil
+<<<<<<< HEAD
 	})
+=======
+	}
+>>>>>>> origin/multiserver2
 }
 
 func sortDriversWithNoTimeToBackOfGrid(entrants []*RaceWeekendSessionEntrant) {
@@ -227,6 +315,7 @@ func sortDriversWithNoTimeToBackOfGrid(entrants []*RaceWeekendSessionEntrant) {
 	})
 }
 
+<<<<<<< HEAD
 func UnchangedRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession, _ []*RaceWeekendSessionEntrant, _ *RaceWeekendSessionToSessionFilter) error {
 	return nil // do nothing
 }
@@ -236,11 +325,23 @@ func FastestLapRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSes
 		entrantI, entrantJ := entrants[i], entrants[j]
 
 		return lessBestLapTime(rw, session, entrantI, entrantJ)
+=======
+func UnchangedRaceWeekendEntryListSort(_ *RaceWeekendSession, _ []*RaceWeekendSessionEntrant) error {
+	return nil // do nothing
+}
+
+func FastestLapRaceWeekendEntryListSort(session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+	sort.Slice(entrants, func(i, j int) bool {
+		entrantI, entrantJ := entrants[i], entrants[j]
+
+		return lessBestLapTime(session, entrantI, entrantJ)
+>>>>>>> origin/multiserver2
 	})
 
 	return nil
 }
 
+<<<<<<< HEAD
 func FastestResultsFileRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant, filter *RaceWeekendSessionToSessionFilter) error {
 
 	if filter == nil {
@@ -304,11 +405,19 @@ func TotalRaceTimeRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekend
 		entrantI, entrantJ := entrants[i], entrants[j]
 
 		return lessTotalEntrantTime(rw, session, entrantI, entrantJ)
+=======
+func TotalRaceTimeRaceWeekendEntryListSort(session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+	sort.Slice(entrants, func(i, j int) bool {
+		entrantI, entrantJ := entrants[i], entrants[j]
+
+		return lessTotalEntrantTime(session, entrantI, entrantJ)
+>>>>>>> origin/multiserver2
 	})
 
 	return nil
 }
 
+<<<<<<< HEAD
 func lessTotalEntrantTime(_ *RaceWeekend, _ *RaceWeekendSession, entrantI, entrantJ *RaceWeekendSessionEntrant) bool {
 	if entrantI.SessionResults.GetNumLaps(entrantI.Car.Driver.GUID, entrantI.Car.Model) == entrantJ.SessionResults.GetNumLaps(entrantJ.Car.Driver.GUID, entrantJ.Car.Model) {
 		// drivers have completed the same number of laps, so compare their total time
@@ -322,6 +431,21 @@ func lessTotalEntrantTime(_ *RaceWeekend, _ *RaceWeekendSession, entrantI, entra
 }
 
 func lessBestLapTime(_ *RaceWeekend, _ *RaceWeekendSession, entrantI, entrantJ *RaceWeekendSessionEntrant) bool {
+=======
+func lessTotalEntrantTime(session *RaceWeekendSession, entrantI, entrantJ *RaceWeekendSessionEntrant) bool {
+	if entrantI.SessionResults.GetNumLaps(entrantI.Car.Driver.GUID) == entrantJ.SessionResults.GetNumLaps(entrantJ.Car.Driver.GUID) {
+		// drivers have completed the same number of laps, so compare their total time
+		entrantITime := entrantI.SessionResults.GetTime(entrantI.EntrantResult.TotalTime, entrantI.Car.Driver.GUID, true)
+		entrantJTime := entrantJ.SessionResults.GetTime(entrantJ.EntrantResult.TotalTime, entrantJ.Car.Driver.GUID, true)
+
+		return entrantITime < entrantJTime
+	} else {
+		return entrantI.SessionResults.GetNumLaps(entrantI.Car.Driver.GUID) > entrantJ.SessionResults.GetNumLaps(entrantJ.Car.Driver.GUID)
+	}
+}
+
+func lessBestLapTime(session *RaceWeekendSession, entrantI, entrantJ *RaceWeekendSessionEntrant) bool {
+>>>>>>> origin/multiserver2
 	if entrantI.EntrantResult.BestLap == 0 {
 		// entrantI has a zero best lap. they must be not-less than J
 		return false
@@ -334,11 +458,19 @@ func lessBestLapTime(_ *RaceWeekend, _ *RaceWeekendSession, entrantI, entrantJ *
 
 	if entrantI.EntrantResult.BestLap == entrantJ.EntrantResult.BestLap {
 		// if equal, compare safety
+<<<<<<< HEAD
 		entrantICrashes := entrantI.SessionResults.GetCrashes(entrantI.Car.Driver.GUID, entrantI.Car.Model)
 		entrantJCrashes := entrantJ.SessionResults.GetCrashes(entrantJ.Car.Driver.GUID, entrantJ.Car.Model)
 
 		if entrantICrashes == entrantJCrashes {
 			return entrantI.SessionResults.GetCuts(entrantI.Car.Driver.GUID, entrantI.Car.Model) < entrantJ.SessionResults.GetCuts(entrantJ.Car.Driver.GUID, entrantJ.Car.Model)
+=======
+		entrantICrashes := entrantI.SessionResults.GetCrashes(entrantI.Car.Driver.GUID)
+		entrantJCrashes := entrantJ.SessionResults.GetCrashes(entrantJ.Car.Driver.GUID)
+
+		if entrantICrashes == entrantJCrashes {
+			return entrantI.SessionResults.GetCuts(entrantI.Car.Driver.GUID) < entrantJ.SessionResults.GetCuts(entrantJ.Car.Driver.GUID)
+>>>>>>> origin/multiserver2
 		}
 
 		return entrantICrashes < entrantJCrashes
@@ -347,6 +479,7 @@ func lessBestLapTime(_ *RaceWeekend, _ *RaceWeekendSession, entrantI, entrantJ *
 	return entrantI.EntrantResult.BestLap < entrantJ.EntrantResult.BestLap
 }
 
+<<<<<<< HEAD
 func lessBestLapTimeInResults(bestDriverLaps map[string]int, entrantI, entrantJ *RaceWeekendSessionEntrant) bool {
 	if bestDriverLaps[entrantI.Car.Driver.GUID] == 0 {
 		return false
@@ -371,6 +504,20 @@ func FewestCollisionsRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeek
 			}
 
 			return lessBestLapTime(rw, session, entrantI, entrantJ)
+=======
+func FewestCollisionsRaceWeekendEntryListSort(session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+	sort.Slice(entrants, func(i, j int) bool {
+		entrantI, entrantJ := entrants[i], entrants[j]
+		entrantICrashes := entrantI.SessionResults.GetCrashes(entrantI.Car.Driver.GUID)
+		entrantJCrashes := entrantJ.SessionResults.GetCrashes(entrantJ.Car.Driver.GUID)
+
+		if entrantICrashes == entrantJCrashes {
+			if session.SessionType() == SessionTypeRace {
+				return lessTotalEntrantTime(session, entrantI, entrantJ)
+			} else {
+				return lessBestLapTime(session, entrantI, entrantJ)
+			}
+>>>>>>> origin/multiserver2
 		}
 
 		return entrantICrashes < entrantJCrashes
@@ -379,6 +526,7 @@ func FewestCollisionsRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeek
 	return nil
 }
 
+<<<<<<< HEAD
 func FewestCutsRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant, _ *RaceWeekendSessionToSessionFilter) error {
 	sort.Slice(entrants, func(i, j int) bool {
 		entrantI, entrantJ := entrants[i], entrants[j]
@@ -391,6 +539,20 @@ func FewestCutsRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSes
 			}
 
 			return lessBestLapTime(rw, session, entrantI, entrantJ)
+=======
+func FewestCutsRaceWeekendEntryListSort(session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+	sort.Slice(entrants, func(i, j int) bool {
+		entrantI, entrantJ := entrants[i], entrants[j]
+		entrantICuts := entrantI.SessionResults.GetCuts(entrantI.Car.Driver.GUID)
+		entrantJCuts := entrantJ.SessionResults.GetCuts(entrantJ.Car.Driver.GUID)
+
+		if entrantICuts == entrantJCuts {
+			if session.SessionType() == SessionTypeRace {
+				return lessTotalEntrantTime(session, entrantI, entrantJ)
+			} else {
+				return lessBestLapTime(session, entrantI, entrantJ)
+			}
+>>>>>>> origin/multiserver2
 		}
 
 		return entrantICuts < entrantJCuts
@@ -399,6 +561,7 @@ func FewestCutsRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSes
 	return nil
 }
 
+<<<<<<< HEAD
 func SafetyRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant, _ *RaceWeekendSessionToSessionFilter) error {
 	sort.Slice(entrants, func(i, j int) bool {
 		entrantI, entrantJ := entrants[i], entrants[j]
@@ -406,10 +569,20 @@ func SafetyRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSession
 		entrantJCrashes := entrantJ.SessionResults.GetCrashes(entrantJ.Car.Driver.GUID, entrantJ.Car.Model)
 		entrantICuts := entrantI.SessionResults.GetCuts(entrantI.Car.Driver.GUID, entrantI.Car.Model)
 		entrantJCuts := entrantJ.SessionResults.GetCuts(entrantJ.Car.Driver.GUID, entrantJ.Car.Model)
+=======
+func SafetyRaceWeekendEntryListSort(session *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+	sort.Slice(entrants, func(i, j int) bool {
+		entrantI, entrantJ := entrants[i], entrants[j]
+		entrantICrashes := entrantI.SessionResults.GetCrashes(entrantI.Car.Driver.GUID)
+		entrantJCrashes := entrantJ.SessionResults.GetCrashes(entrantJ.Car.Driver.GUID)
+		entrantICuts := entrantI.SessionResults.GetCuts(entrantI.Car.Driver.GUID)
+		entrantJCuts := entrantJ.SessionResults.GetCuts(entrantJ.Car.Driver.GUID)
+>>>>>>> origin/multiserver2
 
 		if entrantICrashes == entrantJCrashes {
 			if entrantICuts == entrantJCuts {
 				if session.SessionType() == SessionTypeRace {
+<<<<<<< HEAD
 					return lessTotalEntrantTime(rw, session, entrantI, entrantJ)
 				}
 
@@ -417,6 +590,15 @@ func SafetyRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSession
 			}
 
 			return entrantICuts < entrantJCuts
+=======
+					return lessTotalEntrantTime(session, entrantI, entrantJ)
+				} else {
+					return lessBestLapTime(session, entrantI, entrantJ)
+				}
+			} else {
+				return entrantICuts < entrantJCuts
+			}
+>>>>>>> origin/multiserver2
 		}
 
 		return entrantICrashes < entrantJCrashes
@@ -425,7 +607,11 @@ func SafetyRaceWeekendEntryListSort(rw *RaceWeekend, session *RaceWeekendSession
 	return nil
 }
 
+<<<<<<< HEAD
 func RandomRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant, _ *RaceWeekendSessionToSessionFilter) error {
+=======
+func RandomRaceWeekendEntryListSort(_ *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+>>>>>>> origin/multiserver2
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	r.Shuffle(len(entrants), func(i, j int) {
@@ -435,7 +621,11 @@ func RandomRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession, entra
 	return nil
 }
 
+<<<<<<< HEAD
 func AlphabeticalRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant, _ *RaceWeekendSessionToSessionFilter) error {
+=======
+func AlphabeticalRaceWeekendEntryListSort(_ *RaceWeekendSession, entrants []*RaceWeekendSessionEntrant) error {
+>>>>>>> origin/multiserver2
 	sort.Slice(entrants, func(i, j int) bool {
 		entrantI, entrantJ := entrants[i], entrants[j]
 
@@ -444,6 +634,7 @@ func AlphabeticalRaceWeekendEntryListSort(_ *RaceWeekend, _ *RaceWeekendSession,
 
 	return nil
 }
+<<<<<<< HEAD
 
 type ChampionshipStandingsOrderEntryListSort struct{}
 
@@ -517,3 +708,5 @@ func sortDriversWithNoChampionshipRacesToBackOfGrid(championship *Championship, 
 		return i < j
 	})
 }
+=======
+>>>>>>> origin/multiserver2

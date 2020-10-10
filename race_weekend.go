@@ -1,12 +1,17 @@
 package servermanager
 
 import (
+<<<<<<< HEAD
 	"bytes"
 	"encoding/gob"
 	"fmt"
 	"github.com/teambition/rrule-go"
 	"html/template"
 	"math/rand"
+=======
+	"fmt"
+	"html/template"
+>>>>>>> origin/multiserver2
 	"sort"
 	"strings"
 	"time"
@@ -14,6 +19,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+<<<<<<< HEAD
 	"github.com/teambition/rrule-go"
 )
 
@@ -21,6 +27,10 @@ func init() {
 	gob.Register(&RaceWeekend{})
 }
 
+=======
+)
+
+>>>>>>> origin/multiserver2
 // RaceWeekends are a collection of sessions, where one session influences the EntryList of the next.
 type RaceWeekend struct {
 	ID      uuid.UUID
@@ -32,19 +42,27 @@ type RaceWeekend struct {
 	// Filters is a map of Parent ID -> Child ID -> Filter
 	Filters map[string]map[string]*RaceWeekendSessionToSessionFilter
 
+<<<<<<< HEAD
 	// Deprecated: use GetEntryList() instead
 	EntryList EntryList
 
 	Sessions []*RaceWeekendSession
+=======
+	EntryList EntryList
+	Sessions  []*RaceWeekendSession
+>>>>>>> origin/multiserver2
 
 	// ChampionshipID links a RaceWeekend to a Championship. It can be uuid.Nil
 	ChampionshipID uuid.UUID
 	// Championship is the Championship that is linked to the RaceWeekend.
 	// If ChampionshipID is uuid.Nil, Championship will also be nil
 	Championship *Championship `json:"-"`
+<<<<<<< HEAD
 
 	SpectatorCar        Entrant
 	SpectatorCarEnabled bool
+=======
+>>>>>>> origin/multiserver2
 }
 
 // NewRaceWeekend creates a RaceWeekend
@@ -55,6 +73,7 @@ func NewRaceWeekend() *RaceWeekend {
 	}
 }
 
+<<<<<<< HEAD
 func (rw *RaceWeekend) CompletedTime() time.Time {
 	t := time.Time{}
 
@@ -87,10 +106,13 @@ func (rw *RaceWeekend) Duplicate() (*RaceWeekend, error) {
 	return &newRaceWeekend, nil
 }
 
+=======
+>>>>>>> origin/multiserver2
 func (rw *RaceWeekend) HasLinkedChampionship() bool {
 	return rw.ChampionshipID != uuid.Nil
 }
 
+<<<<<<< HEAD
 func (rw *RaceWeekend) GetSpectatorCar() Entrant {
 	if rw.HasLinkedChampionship() && rw.Championship != nil {
 		return rw.Championship.SpectatorCar
@@ -109,6 +131,8 @@ func (rw *RaceWeekend) HasSpectatorCar() bool {
 	return rw.SpectatorCarEnabled && car.GUID != "" && car.Model != ""
 }
 
+=======
+>>>>>>> origin/multiserver2
 func (rw *RaceWeekend) InProgress() bool {
 	for _, session := range rw.Sessions {
 		if session.InProgress() {
@@ -126,6 +150,7 @@ func (rw *RaceWeekend) GetEntryList() EntryList {
 		count := 0
 
 		// filter out drivers with no GUID (open championships etc...)
+<<<<<<< HEAD
 		for _, class := range rw.Championship.Classes {
 			for _, entrant := range class.Entrants {
 				if entrant.GUID == "" || entrant.IsPlaceHolder {
@@ -148,6 +173,21 @@ func (rw *RaceWeekend) GetEntryList() EntryList {
 	}
 
 	return rw.EntryList
+=======
+		for _, entrant := range rw.Championship.AllEntrants().AlphaSlice() {
+			if entrant.GUID == "" {
+				continue
+			}
+
+			entryList.AddInPitBox(entrant, count)
+			count++
+		}
+
+		return entryList
+	} else {
+		return rw.EntryList
+	}
+>>>>>>> origin/multiserver2
 }
 
 func (rw *RaceWeekend) Completed() bool {
@@ -299,7 +339,11 @@ func (rw *RaceWeekend) SessionCanBeRun(s *RaceWeekendSession) bool {
 	for _, parentID := range s.ParentIDs {
 		parent, err := rw.FindSessionByID(parentID.String())
 
+<<<<<<< HEAD
 		if err == ErrRaceWeekendSessionNotFound {
+=======
+		if err == RaceWeekendSessionNotFound {
+>>>>>>> origin/multiserver2
 			logrus.Warnf("Race weekend session for id: %s not found", parentID.String())
 			continue
 		} else if err != nil {
@@ -423,7 +467,11 @@ func (rw *RaceWeekend) TrackOverview() string {
 			trackDescription = prettifyName(session.RaceConfig.Track, false)
 
 			if session.RaceConfig.TrackLayout != "" {
+<<<<<<< HEAD
 				trackDescription += " (" + prettifyName(session.RaceConfig.TrackLayout, true) + ")"
+=======
+				trackDescription = " (" + prettifyName(session.RaceConfig.TrackLayout, true) + ")"
+>>>>>>> origin/multiserver2
 			}
 		}
 
@@ -440,8 +488,13 @@ func (rw *RaceWeekend) TrackOverview() string {
 }
 
 var (
+<<<<<<< HEAD
 	ErrRaceWeekendNotFound        = errors.New("servermanager: race weekend not found")
 	ErrRaceWeekendSessionNotFound = errors.New("servermanager: race weekend session not found")
+=======
+	ErrRaceWeekendNotFound     = errors.New("servermanager: race weekend not found")
+	RaceWeekendSessionNotFound = errors.New("servermanager: race weekend session not found")
+>>>>>>> origin/multiserver2
 )
 
 // FindSessionByID finds a RaceWeekendSession by its unique identifier
@@ -463,7 +516,11 @@ func (rw *RaceWeekend) FindSessionByID(id string) (*RaceWeekendSession, error) {
 		return sess, nil
 	}
 
+<<<<<<< HEAD
 	return nil, ErrRaceWeekendSessionNotFound
+=======
+	return nil, RaceWeekendSessionNotFound
+>>>>>>> origin/multiserver2
 }
 
 // EnhanceResults takes a set of SessionResults and attaches Championship information to them.
@@ -473,7 +530,10 @@ func (rw *RaceWeekend) EnhanceResults(results *SessionResults) {
 	}
 
 	results.RaceWeekendID = rw.ID.String()
+<<<<<<< HEAD
 	results.NormaliseDriverSwapGUIDs()
+=======
+>>>>>>> origin/multiserver2
 
 	if rw.HasLinkedChampionship() {
 		// linked championships determine class IDs etc for drivers.
@@ -481,6 +541,7 @@ func (rw *RaceWeekend) EnhanceResults(results *SessionResults) {
 	}
 }
 
+<<<<<<< HEAD
 func (rw *RaceWeekend) MostRecentScheduledDateFormat(format string) string {
 	scheduledDate := time.Now()
 
@@ -493,6 +554,8 @@ func (rw *RaceWeekend) MostRecentScheduledDateFormat(format string) string {
 	return scheduledDate.Format(format)
 }
 
+=======
+>>>>>>> origin/multiserver2
 // A RaceWeekendSessionEntrant is someone who has entered at least one RaceWeekend event.
 type RaceWeekendSessionEntrant struct {
 	// SessionID is the last session the Entrant participated in
@@ -505,11 +568,14 @@ type RaceWeekendSessionEntrant struct {
 	PitBox int
 	// SessionResults are the whole results for the session the entrant took part in
 	SessionResults *SessionResults `json:"-"`
+<<<<<<< HEAD
 
 	IsPlaceholder bool `json:"-"`
 
 	// OverrideSetupFile is a path to an overridden setup for a Race Weekend
 	OverrideSetupFile string
+=======
+>>>>>>> origin/multiserver2
 }
 
 // NewRaceWeekendSessionEntrant creates a RaceWeekendSessionEntrant
@@ -527,8 +593,11 @@ func (se *RaceWeekendSessionEntrant) GetEntrant() *Entrant {
 	e := NewEntrant()
 
 	e.AssignFromResult(se.EntrantResult, se.Car)
+<<<<<<< HEAD
 	e.IsPlaceHolder = se.IsPlaceholder
 	e.FixedSetup = se.OverrideSetupFile
+=======
+>>>>>>> origin/multiserver2
 
 	return e
 }
@@ -564,6 +633,7 @@ type RaceWeekendSession struct {
 	OverridePassword    bool
 	ReplacementPassword string
 
+<<<<<<< HEAD
 	StartedTime                time.Time
 	CompletedTime              time.Time
 	ScheduledTime              time.Time
@@ -572,10 +642,16 @@ type RaceWeekendSession struct {
 	StartWhenParentHasFinished bool
 
 	Scheduled     time.Time
+=======
+	StartedTime   time.Time
+	CompletedTime time.Time
+	Results       *SessionResults
+>>>>>>> origin/multiserver2
 
 	Points map[uuid.UUID]*ChampionshipPoints
 
 	isBase bool
+<<<<<<< HEAD
 
 	// raceWeekend is here for use when satisfying the ScheduledEvent interface.
 	raceWeekend *RaceWeekend
@@ -679,6 +755,8 @@ func (rws *RaceWeekendSession) SetRecurrenceRule(input string) error {
 
 func (rws *RaceWeekendSession) ClearRecurrenceRule() {
 	// no-op
+=======
+>>>>>>> origin/multiserver2
 }
 
 // NewRaceWeekendSession creates an empty RaceWeekendSession
@@ -694,9 +772,15 @@ func NewRaceWeekendSession() *RaceWeekendSession {
 func (rws *RaceWeekendSession) Name() string {
 	if rws.isBase {
 		return "Entry List"
+<<<<<<< HEAD
 	}
 
 	return rws.SessionInfo().Name
+=======
+	} else {
+		return rws.SessionInfo().Name
+	}
+>>>>>>> origin/multiserver2
 }
 
 // SessionInfo returns the information about the Assetto Corsa Session (i.e. practice, qualifying, race)
@@ -729,7 +813,11 @@ func (rws *RaceWeekendSession) FinishingGrid(raceWeekend *RaceWeekend) ([]*RaceW
 
 	if rws.Completed() {
 		for _, result := range rws.Results.Result {
+<<<<<<< HEAD
 			if result.DriverGUID == "" || result.Disqualified || (raceWeekend.HasSpectatorCar() && result.DriverGUID == raceWeekend.GetSpectatorCar().GUID) {
+=======
+			if result.DriverGUID == "" || result.Disqualified {
+>>>>>>> origin/multiserver2
 				// filter out invalid results
 				continue
 			}
@@ -748,19 +836,28 @@ func (rws *RaceWeekendSession) FinishingGrid(raceWeekend *RaceWeekend) ([]*RaceW
 			foundEntrant := false
 
 			for _, driver := range out {
+<<<<<<< HEAD
 				if driver.Car.GetGUID() == entrant.Car.GetGUID() || NormaliseEntrantGUIDs(driver.Car.Driver.GuidsList) == entrant.Car.GetGUID() {
+=======
+				if driver.Car.GetGUID() == entrant.Car.GetGUID() {
+>>>>>>> origin/multiserver2
 					foundEntrant = true
 					break
 				}
 			}
 
+<<<<<<< HEAD
 			if !foundEntrant && entrant.Car.GetGUID() != "" && (rws.IsBase() || !entrant.IsPlaceholder) {
+=======
+			if !foundEntrant && entrant.Car.GetGUID() != "" {
+>>>>>>> origin/multiserver2
 				if raceWeekend.HasLinkedChampionship() {
 					// find the class ID for the car
 					class, err := raceWeekend.Championship.FindClassForCarModel(entrant.Car.GetCar())
 
 					if err != nil {
 						logrus.WithError(err).Warnf("Could not find class for car model: %s for entrant %s", entrant.Car.GetCar(), entrant.Car.GetGUID())
+<<<<<<< HEAD
 					} else {
 						entrant.EntrantResult.ClassID = class.ID
 					}
@@ -770,6 +867,14 @@ func (rws *RaceWeekendSession) FinishingGrid(raceWeekend *RaceWeekend) ([]*RaceW
 				e.IsPlaceholder = entrant.IsPlaceholder
 
 				out = append(out, e)
+=======
+					}
+
+					entrant.EntrantResult.ClassID = class.ID
+				}
+
+				out = append(out, NewRaceWeekendSessionEntrant(rws.ID, entrant.Car, entrant.EntrantResult, rws.Results))
+>>>>>>> origin/multiserver2
 			}
 		}
 	} else {
@@ -839,6 +944,7 @@ var ErrRaceWeekendSessionDependencyIncomplete = errors.New("servermanager: race 
 
 // GetRaceWeekendEntryList returns the RaceWeekendEntryList for the given session, built from the parent session(s) results and applied filters.
 func (rws *RaceWeekendSession) GetRaceWeekendEntryList(rw *RaceWeekend, overrideFilter *RaceWeekendSessionToSessionFilter, overrideFilterSessionID string) (RaceWeekendEntryList, error) {
+<<<<<<< HEAD
 	var entryList RaceWeekendEntryList
 
 	if rws.IsBase() {
@@ -855,26 +961,56 @@ func (rws *RaceWeekendSession) GetRaceWeekendEntryList(rw *RaceWeekend, override
 		}
 
 		err := overrideFilter.Filter(rw, rws, rws, entryList, &entryList)
+=======
+	if rws.IsBase() {
+		// base race weekend sessions just return the race weekend EntryList
+		return EntryListToRaceWeekendEntryList(rw.GetEntryList(), rws.ID), nil
+	}
+
+	entryList := make(RaceWeekendEntryList, 0)
+
+	for _, parentSessionID := range rws.ParentIDs {
+		parentSession, err := rw.FindSessionByID(parentSessionID.String())
 
 		if err != nil {
 			return nil, err
 		}
+
+		finishingGrid, err := parentSession.FinishingGrid(rw)
+>>>>>>> origin/multiserver2
+
+		if err != nil {
+			return nil, err
+		}
+<<<<<<< HEAD
 	} else {
 		entryList = make(RaceWeekendEntryList, 0)
 
 		for _, parentSessionID := range rws.ParentIDs {
 			parentSession, err := rw.FindSessionByID(parentSessionID.String())
+=======
+
+		if overrideFilter != nil && parentSessionID.String() == overrideFilterSessionID {
+			// override filters are provided when users are modifying filters for their race weekend setups
+			err = overrideFilter.Filter(parentSession, rws, finishingGrid, &entryList)
+>>>>>>> origin/multiserver2
 
 			if err != nil {
 				return nil, err
 			}
+<<<<<<< HEAD
 
 			finishingGrid, err := parentSession.FinishingGrid(rw)
+=======
+		} else {
+			sessionToSessionFilter, err := rw.GetFilterOrUseDefault(parentSessionID.String(), rws.ID.String())
+>>>>>>> origin/multiserver2
 
 			if err != nil {
 				return nil, err
 			}
 
+<<<<<<< HEAD
 			if overrideFilter != nil && parentSessionID.String() == overrideFilterSessionID {
 				// override filters are provided when users are modifying filters for their race weekend setups
 				err = overrideFilter.Filter(rw, parentSession, rws, finishingGrid, &entryList)
@@ -894,6 +1030,12 @@ func (rws *RaceWeekendSession) GetRaceWeekendEntryList(rw *RaceWeekend, override
 				if err != nil {
 					return nil, err
 				}
+=======
+			err = sessionToSessionFilter.Filter(parentSession, rws, finishingGrid, &entryList)
+
+			if err != nil {
+				return nil, err
+>>>>>>> origin/multiserver2
 			}
 		}
 	}
@@ -902,7 +1044,11 @@ func (rws *RaceWeekendSession) GetRaceWeekendEntryList(rw *RaceWeekend, override
 		// sorting can only be run if a session is ready to be run.
 		sorter := GetRaceWeekendEntryListSort(rws.SortType)
 
+<<<<<<< HEAD
 		if err := sorter.Sort(rw, rws, entryList, nil); err != nil {
+=======
+		if err := sorter(rws, entryList); err != nil {
+>>>>>>> origin/multiserver2
 			return nil, err
 		}
 
@@ -921,7 +1067,10 @@ func EntryListToRaceWeekendEntryList(e EntryList, sessionID uuid.UUID) RaceWeeke
 
 	for _, entrant := range e.AsSlice() {
 		rwe := NewRaceWeekendSessionEntrant(sessionID, entrant.AsSessionCar(), entrant.AsSessionResult(), nil)
+<<<<<<< HEAD
 		rwe.IsPlaceholder = entrant.IsPlaceHolder
+=======
+>>>>>>> origin/multiserver2
 
 		out.AddInPitBox(rwe, entrant.PitBox)
 	}
@@ -979,12 +1128,15 @@ func (e RaceWeekendEntryList) AsEntryList() EntryList {
 	entryList := make(EntryList)
 
 	for _, entrant := range e {
+<<<<<<< HEAD
 		x := entrant.GetEntrant()
 
 		if entrant.OverrideSetupFile != "" {
 			x.FixedSetup = entrant.OverrideSetupFile
 		}
 
+=======
+>>>>>>> origin/multiserver2
 		entryList.AddInPitBox(entrant.GetEntrant(), entrant.PitBox)
 	}
 
@@ -993,6 +1145,7 @@ func (e RaceWeekendEntryList) AsEntryList() EntryList {
 
 // ActiveRaceWeekend indicates which RaceWeekend and RaceWeekendSession are currently running on the server.
 type ActiveRaceWeekend struct {
+<<<<<<< HEAD
 	Name                                     string
 	RaceWeekendID, SessionID, ChampionshipID uuid.UUID
 	OverridePassword                         bool
@@ -1013,6 +1166,13 @@ func (a ActiveRaceWeekend) GetEntryList() EntryList {
 
 func (a ActiveRaceWeekend) IsLooping() bool {
 	return false
+=======
+	Name                     string
+	RaceWeekendID, SessionID uuid.UUID
+	OverridePassword         bool
+	ReplacementPassword      string
+	Description              string
+>>>>>>> origin/multiserver2
 }
 
 func (a ActiveRaceWeekend) IsChampionship() bool {
@@ -1023,6 +1183,7 @@ func (a ActiveRaceWeekend) IsRaceWeekend() bool {
 	return true
 }
 
+<<<<<<< HEAD
 func (a ActiveRaceWeekend) IsPractice() bool {
 	return a.IsPracticeSession
 }
@@ -1031,6 +1192,8 @@ func (a ActiveRaceWeekend) IsTimeAttack() bool {
 	return false
 }
 
+=======
+>>>>>>> origin/multiserver2
 func (a ActiveRaceWeekend) OverrideServerPassword() bool {
 	return a.OverridePassword
 }
@@ -1040,6 +1203,7 @@ func (a ActiveRaceWeekend) ReplacementServerPassword() string {
 }
 
 func (a ActiveRaceWeekend) EventName() string {
+<<<<<<< HEAD
 	name := "Race Weekend: " + a.Name
 
 	if a.IsPracticeSession {
@@ -1047,6 +1211,9 @@ func (a ActiveRaceWeekend) EventName() string {
 	}
 
 	return name
+=======
+	return "Race Weekend: " + a.Name
+>>>>>>> origin/multiserver2
 }
 
 func (a ActiveRaceWeekend) EventDescription() string {
@@ -1055,6 +1222,7 @@ func (a ActiveRaceWeekend) EventDescription() string {
 
 func (a ActiveRaceWeekend) GetURL() string {
 	if config.HTTP.BaseURL != "" {
+<<<<<<< HEAD
 		if a.ChampionshipID != uuid.Nil {
 			return config.HTTP.BaseURL + "/championship/" + a.ChampionshipID.String()
 		}
@@ -1071,4 +1239,10 @@ func (a ActiveRaceWeekend) GetForceStopTime() time.Duration {
 
 func (a ActiveRaceWeekend) GetForceStopWithDrivers() bool {
 	return false
+=======
+		return config.HTTP.BaseURL + "/race-weekend/" + a.RaceWeekendID.String()
+	} else {
+		return ""
+	}
+>>>>>>> origin/multiserver2
 }

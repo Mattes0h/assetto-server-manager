@@ -5,12 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+<<<<<<< HEAD
 	"os"
+=======
+>>>>>>> origin/multiserver2
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
 
@@ -18,10 +22,17 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
+=======
+	"github.com/cj123/assetto-server-manager/pkg/udp"
+
+	"github.com/go-chi/chi"
+	"github.com/google/uuid"
+>>>>>>> origin/multiserver2
 	"github.com/sirupsen/logrus"
 )
 
 type RaceWeekendManager struct {
+<<<<<<< HEAD
 	raceManager         *RaceManager
 	championshipManager *ChampionshipManager
 	notificationManager NotificationDispatcher
@@ -54,6 +65,21 @@ func NewRaceWeekendManager(
 
 		scheduledSessionTimers:         make(map[string]*when.Timer),
 		scheduledSessionReminderTimers: make(map[string]*when.Timer),
+=======
+	raceManager *RaceManager
+	store       Store
+	process     ServerProcess
+
+	activeRaceWeekend *ActiveRaceWeekend
+	mutex             sync.Mutex
+}
+
+func NewRaceWeekendManager(raceManager *RaceManager, store Store, process ServerProcess) *RaceWeekendManager {
+	return &RaceWeekendManager{
+		raceManager: raceManager,
+		store:       store,
+		process:     process,
+>>>>>>> origin/multiserver2
 	}
 }
 
@@ -74,6 +100,7 @@ func (rwm *RaceWeekendManager) LoadRaceWeekend(id string) (*RaceWeekend, error) 
 		if err != nil {
 			return nil, err
 		}
+<<<<<<< HEAD
 
 		for _, session := range raceWeekend.Sessions {
 			// make sure that session points only exist for classes that exist.
@@ -105,11 +132,14 @@ func (rwm *RaceWeekendManager) LoadRaceWeekend(id string) (*RaceWeekend, error) 
 				}
 			}
 		}
+=======
+>>>>>>> origin/multiserver2
 	}
 
 	return raceWeekend, nil
 }
 
+<<<<<<< HEAD
 func (rwm *RaceWeekendManager) FindRaceWeekendForSession(sessionID string) (*RaceWeekend, *RaceWeekendSession, error) {
 	raceWeekends, err := rwm.ListRaceWeekends()
 
@@ -126,6 +156,8 @@ func (rwm *RaceWeekendManager) FindRaceWeekendForSession(sessionID string) (*Rac
 	return nil, nil, ErrRaceWeekendNotFound
 }
 
+=======
+>>>>>>> origin/multiserver2
 func (rwm *RaceWeekendManager) BuildRaceWeekendTemplateOpts(r *http.Request) (*RaceTemplateVars, error) {
 	opts, err := rwm.raceManager.BuildRaceOpts(r)
 
@@ -216,14 +248,19 @@ func (rwm *RaceWeekendManager) SaveRaceWeekend(r *http.Request) (raceWeekend *Ra
 			}
 		}
 	} else {
+<<<<<<< HEAD
 		// entrylist length is -1 to accommodate for spectator car (below)
 		entryList, err := rwm.raceManager.BuildEntryList(r, 0, len(r.Form["EntryList.Name"])-1)
+=======
+		entryList, err := rwm.raceManager.BuildEntryList(r, 0, len(r.Form["EntryList.Name"]))
+>>>>>>> origin/multiserver2
 
 		if err != nil {
 			return nil, edited, err
 		}
 
 		raceWeekend.EntryList = entryList
+<<<<<<< HEAD
 
 		// persist race weekend entrants in the autofill entry list
 		if err := rwm.raceManager.SaveEntrantsForAutoFill(entryList); err != nil {
@@ -263,6 +300,11 @@ func (rwm *RaceWeekendManager) UpsertRaceWeekend(raceWeekend *RaceWeekend) error
 	}
 
 	return nil
+=======
+	}
+
+	return raceWeekend, edited, rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) BuildRaceWeekendSessionOpts(r *http.Request) (*RaceTemplateVars, error) {
@@ -296,6 +338,10 @@ func (rwm *RaceWeekendManager) BuildRaceWeekendSessionOpts(r *http.Request) (*Ra
 
 		if err == ErrRaceWeekendSessionDependencyIncomplete {
 			opts.CurrentEntrants = raceWeekend.GetEntryList()
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/multiserver2
 		} else if err != nil {
 			return nil, err
 		} else {
@@ -448,15 +494,19 @@ func (rwm *RaceWeekendManager) SaveRaceWeekendSession(r *http.Request) (raceWeek
 			}
 
 			pts.BestLap = formValueAsInt(r.Form["Points.BestLap"][i])
+<<<<<<< HEAD
 			pts.CollisionWithDriver = formValueAsInt(r.Form["Points.CollisionWithDriver"][i])
 			pts.CollisionWithEnv = formValueAsInt(r.Form["Points.CollisionWithEnv"][i])
 			pts.CutTrack = formValueAsInt(r.Form["Points.CutTrack"][i])
+=======
+>>>>>>> origin/multiserver2
 
 			previousNumPoints += numPointsForClass
 			session.Points[classID] = pts
 		}
 	}
 
+<<<<<<< HEAD
 	return raceWeekend, session, edited, rwm.UpsertRaceWeekend(raceWeekend)
 }
 
@@ -464,11 +514,19 @@ func (rwm *RaceWeekendManager) applyConfigAndStart(raceWeekend *ActiveRaceWeeken
 	rwm.activeRaceWeekend = raceWeekend
 
 	err := rwm.raceManager.applyConfigAndStart(raceWeekend)
+=======
+	return raceWeekend, session, edited, rwm.store.UpsertRaceWeekend(raceWeekend)
+}
+
+func (rwm *RaceWeekendManager) applyConfigAndStart(config CurrentRaceConfig, entryList EntryList, raceWeekend *ActiveRaceWeekend) error {
+	err := rwm.raceManager.applyConfigAndStart(config, entryList, false, raceWeekend)
+>>>>>>> origin/multiserver2
 
 	if err != nil {
 		return err
 	}
 
+<<<<<<< HEAD
 	return nil
 }
 
@@ -481,6 +539,14 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 		return errors.New("servermanager: premium required")
 	}
 
+=======
+	rwm.activeRaceWeekend = raceWeekend
+
+	return nil
+}
+
+func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSessionID string) error {
+>>>>>>> origin/multiserver2
 	raceWeekend, err := rwm.LoadRaceWeekend(raceWeekendID)
 
 	if err != nil {
@@ -493,6 +559,7 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 		return err
 	}
 
+<<<<<<< HEAD
 	if !isPracticeSession {
 		if !raceWeekend.SessionCanBeRun(session) {
 			return ErrRaceWeekendSessionDependencyIncomplete
@@ -503,6 +570,16 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 		if err := rwm.UpsertRaceWeekend(raceWeekend); err != nil {
 			return err
 		}
+=======
+	if !raceWeekend.SessionCanBeRun(session) {
+		return ErrRaceWeekendSessionDependencyIncomplete
+	}
+
+	session.StartedTime = time.Now()
+
+	if err := rwm.store.UpsertRaceWeekend(raceWeekend); err != nil {
+		return err
+>>>>>>> origin/multiserver2
 	}
 
 	raceWeekendEntryList, err := session.GetRaceWeekendEntryList(raceWeekend, nil, "")
@@ -513,6 +590,7 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 
 	entryList := raceWeekendEntryList.AsEntryList()
 
+<<<<<<< HEAD
 	if isPracticeSession && !raceWeekend.SessionCanBeRun(session) {
 		// practice sessions run with the whole race weekend entry list if they are not yet available
 		entryList = raceWeekend.GetEntryList()
@@ -550,6 +628,12 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 	session.RaceConfig.Cars = strings.Join(entryList.CarIDs(), ";")
 	session.RaceConfig.LockedEntryList = 1
 	session.RaceConfig.PickupModeEnabled = 1
+=======
+	session.RaceConfig.MaxClients = len(entryList)
+	session.RaceConfig.Cars = strings.Join(entryList.CarIDs(), ";")
+	session.RaceConfig.LockedEntryList = 1
+	session.RaceConfig.PickupModeEnabled = 0
+>>>>>>> origin/multiserver2
 
 	// all race weekend sessions must be open so players can join
 	for _, acSession := range session.RaceConfig.Sessions {
@@ -558,23 +642,33 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 
 	overridePassword := session.OverridePassword
 	replacementPassword := session.ReplacementPassword
+<<<<<<< HEAD
 	description := fmt.Sprintf("This is a session in the '%s' Race Weekend. Please note that the server will restart between each Race Weekend session.", raceWeekend.Name)
 
 	var championshipID uuid.UUID
+=======
+>>>>>>> origin/multiserver2
 
 	if raceWeekend.HasLinkedChampionship() {
 		overridePassword = raceWeekend.Championship.OverridePassword
 		replacementPassword = raceWeekend.Championship.ReplacementPassword
+<<<<<<< HEAD
 		description += string(raceWeekend.Championship.Info)
 		championshipID = raceWeekend.ChampionshipID
 	}
 
 	raceWeekendRaceEvent := &ActiveRaceWeekend{
+=======
+	}
+
+	return rwm.applyConfigAndStart(session.RaceConfig, entryList, &ActiveRaceWeekend{
+>>>>>>> origin/multiserver2
 		Name:                raceWeekend.Name,
 		RaceWeekendID:       raceWeekend.ID,
 		SessionID:           session.ID,
 		OverridePassword:    overridePassword,
 		ReplacementPassword: replacementPassword,
+<<<<<<< HEAD
 		Description:         description,
 		RaceConfig:          session.RaceConfig,
 		EntryList:           entryList,
@@ -603,17 +697,30 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 	}
 
 	return rwm.applyConfigAndStart(raceWeekendRaceEvent)
+=======
+		Description:         "", // @TODO?
+	})
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) UDPCallback(message udp.Message) {
 	rwm.mutex.Lock()
 	defer rwm.mutex.Unlock()
 
+<<<<<<< HEAD
 	if !rwm.RaceWeekendSessionIsRunning() {
 		return
 	}
 
 	if m, ok := message.(udp.EndSession); ok {
+=======
+	if !rwm.process.Event().IsRaceWeekend() || rwm.activeRaceWeekend == nil {
+		return
+	}
+
+	switch m := message.(type) {
+	case udp.EndSession:
+>>>>>>> origin/multiserver2
 		filename := filepath.Base(string(m))
 		logrus.Infof("Race Weekend: End session found, result file: %s", filename)
 
@@ -651,7 +758,11 @@ func (rwm *RaceWeekendManager) UDPCallback(message udp.Message) {
 
 		session.Results = results
 
+<<<<<<< HEAD
 		if err := rwm.UpsertRaceWeekend(raceWeekend); err != nil {
+=======
+		if err := rwm.store.UpsertRaceWeekend(raceWeekend); err != nil {
+>>>>>>> origin/multiserver2
 			logrus.WithError(err).Errorf("Could not persist race weekend: %s", raceWeekend.ID.String())
 			return
 		}
@@ -659,6 +770,7 @@ func (rwm *RaceWeekendManager) UDPCallback(message udp.Message) {
 		if err := rwm.process.Stop(); err != nil {
 			logrus.WithError(err).Error("Could not stop assetto server process")
 		}
+<<<<<<< HEAD
 
 		if err := rwm.ClearLockedTyreSetups(raceWeekend, session); err != nil {
 			logrus.WithError(err).Error("Could not clear previous locked tyres")
@@ -739,6 +851,11 @@ func (rwm *RaceWeekendManager) ClearLockedTyreSetups(raceWeekend *RaceWeekend, s
 	return nil
 }
 
+=======
+	}
+}
+
+>>>>>>> origin/multiserver2
 func (rwm *RaceWeekendManager) RestartSession(raceWeekendID string, raceWeekendSessionID string) error {
 	err := rwm.CancelSession(raceWeekendID, raceWeekendSessionID)
 
@@ -746,7 +863,11 @@ func (rwm *RaceWeekendManager) RestartSession(raceWeekendID string, raceWeekendS
 		return err
 	}
 
+<<<<<<< HEAD
 	return rwm.StartSession(raceWeekendID, raceWeekendSessionID, false)
+=======
+	return rwm.StartSession(raceWeekendID, raceWeekendSessionID)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) CancelSession(raceWeekendID string, raceWeekendSessionID string) error {
@@ -770,7 +891,11 @@ func (rwm *RaceWeekendManager) CancelSession(raceWeekendID string, raceWeekendSe
 		return err
 	}
 
+<<<<<<< HEAD
 	return rwm.UpsertRaceWeekend(raceWeekend)
+=======
+	return rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) DeleteSession(raceWeekendID string, raceWeekendSessionID string) error {
@@ -782,7 +907,11 @@ func (rwm *RaceWeekendManager) DeleteSession(raceWeekendID string, raceWeekendSe
 
 	raceWeekend.DelSession(raceWeekendSessionID)
 
+<<<<<<< HEAD
 	return rwm.UpsertRaceWeekend(raceWeekend)
+=======
+	return rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) DeleteRaceWeekend(id string) error {
@@ -791,12 +920,17 @@ func (rwm *RaceWeekendManager) DeleteRaceWeekend(id string) error {
 
 var ErrNoActiveRaceWeekendSession = errors.New("servermanager: no active race weekend session")
 
+<<<<<<< HEAD
 func (rwm *RaceWeekendManager) RaceWeekendSessionIsRunning() bool {
 	return rwm.process.Event().IsRaceWeekend() && !rwm.process.Event().IsPractice() && rwm.activeRaceWeekend != nil
 }
 
 func (rwm *RaceWeekendManager) StopActiveSession() error {
 	if !rwm.RaceWeekendSessionIsRunning() {
+=======
+func (rwm *RaceWeekendManager) StopActiveSession() error {
+	if !rwm.process.Event().IsRaceWeekend() || rwm.activeRaceWeekend == nil {
+>>>>>>> origin/multiserver2
 		return ErrNoActiveRaceWeekendSession
 	}
 
@@ -804,7 +938,11 @@ func (rwm *RaceWeekendManager) StopActiveSession() error {
 }
 
 func (rwm *RaceWeekendManager) RestartActiveSession() error {
+<<<<<<< HEAD
 	if !rwm.RaceWeekendSessionIsRunning() {
+=======
+	if !rwm.process.Event().IsRaceWeekend() || rwm.activeRaceWeekend == nil {
+>>>>>>> origin/multiserver2
 		return ErrNoActiveRaceWeekendSession
 	}
 
@@ -812,10 +950,13 @@ func (rwm *RaceWeekendManager) RestartActiveSession() error {
 }
 
 func (rwm *RaceWeekendManager) ImportSession(raceWeekendID string, raceWeekendSessionID string, r *http.Request) error {
+<<<<<<< HEAD
 	if !Premium() {
 		return errors.New("servermanager: premium required")
 	}
 
+=======
+>>>>>>> origin/multiserver2
 	if err := r.ParseForm(); err != nil {
 		return err
 	}
@@ -850,6 +991,7 @@ func (rwm *RaceWeekendManager) ImportSession(raceWeekendID string, raceWeekendSe
 
 	session.CompletedTime = session.Results.Date
 
+<<<<<<< HEAD
 	return rwm.UpsertRaceWeekend(raceWeekend)
 }
 
@@ -883,6 +1025,9 @@ func (rwm *RaceWeekendManager) ListAvailableResultsFilesForSorting(raceWeekend *
 	}
 
 	return filteredResults, nil
+=======
+	return rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) ListAvailableResultsFilesForSession(raceWeekendID string, raceWeekendSessionID string) (*RaceWeekendSession, []SessionResults, error) {
@@ -1049,7 +1194,11 @@ func (rwm *RaceWeekendManager) UpdateGrid(raceWeekendID, parentSessionID, childS
 
 	raceWeekend.AddFilter(parentSessionID, childSessionID, filter)
 
+<<<<<<< HEAD
 	return rwm.UpsertRaceWeekend(raceWeekend)
+=======
+	return rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) PreviewSessionEntryList(raceWeekendID, sessionID, sortType string, reverseGrid int) (*RaceWeekendGridPreview, error) {
@@ -1118,7 +1267,11 @@ func (rwm *RaceWeekendManager) UpdateSessionSorting(raceWeekendID, sessionID str
 	session.SortType = sortType
 	session.NumEntrantsToReverse = numEntrantsToReverse
 
+<<<<<<< HEAD
 	return rwm.UpsertRaceWeekend(raceWeekend)
+=======
+	return rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }
 
 func (rwm *RaceWeekendManager) ImportRaceWeekend(data string) (string, error) {
@@ -1130,6 +1283,7 @@ func (rwm *RaceWeekendManager) ImportRaceWeekend(data string) (string, error) {
 		return "", err
 	}
 
+<<<<<<< HEAD
 	return raceWeekend.ID.String(), rwm.UpsertRaceWeekend(raceWeekend)
 }
 
@@ -1287,4 +1441,7 @@ func (rwm *RaceWeekendManager) DeScheduleSession(raceWeekendID, sessionID string
 	rwm.clearScheduledSessionTimer(session)
 
 	return rwm.UpsertRaceWeekend(raceWeekend)
+=======
+	return raceWeekend.ID.String(), rwm.store.UpsertRaceWeekend(raceWeekend)
+>>>>>>> origin/multiserver2
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 {{/* gotype:github.com/JustaPenguin/assetto-server-manager.raceWeekendManageEntryListTemplateVars */}}
+=======
+{{/* gotype:github.com/cj123/assetto-server-manager.raceWeekendManageEntryListTemplateVars */}}
+>>>>>>> origin/multiserver2
 
 {{ define "partial" }}
     <div class="modal-dialog modal-lg" role="document">
@@ -25,19 +29,29 @@
                         {{ if WriteAccess }}
                             <select id="SortType" name="SortType" class="form-control">
                                 {{ range $index, $sorter := $.AvailableSorters }}
+<<<<<<< HEAD
                                     {{ if $sorter.ShowInManageEntryList }}
                                         <option value="{{ $sorter.Key }}" {{ if eq $sorter.Key $.Session.SortType }}selected="selected"{{ end }}>{{ $sorter.Name }}</option>
                                     {{ end }}
+=======
+                                    <option value="{{ $sorter.Key }}" {{ if eq $sorter.Key $.Session.SortType }}selected="selected"{{ end }}>{{ $sorter.Name }}</option>
+>>>>>>> origin/multiserver2
                                 {{ end }}
                             </select>
                         {{ else }}
                             <label class="col-form-label">
                                 {{ range $index, $sorter := $.AvailableSorters }}
+<<<<<<< HEAD
                                     {{ if $sorter.ShowInManageEntryList }}
                                         {{ if eq $sorter.Key $.Session.SortType }}
                                             {{ $sorter.Name }}
                                         {{ end }}
                                     {{ end}}
+=======
+                                    {{ if eq $sorter.Key $.Session.SortType }}
+                                        {{ $sorter.Name }}
+                                    {{ end }}
+>>>>>>> origin/multiserver2
                                 {{ end }}
                             </label>
                         {{ end }}

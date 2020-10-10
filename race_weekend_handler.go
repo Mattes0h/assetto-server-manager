@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"time"
 
+<<<<<<< HEAD
 	"4d63.com/tz"
+=======
+>>>>>>> origin/multiserver2
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
 )
@@ -98,7 +101,11 @@ func (rwh *RaceWeekendHandler) submit(w http.ResponseWriter, r *http.Request) {
 	raceWeekend, edited, err := rwh.raceWeekendManager.SaveRaceWeekend(r)
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("couldn't create race weekend")
+=======
+		logrus.Errorf("couldn't create race weekend, err: %s", err)
+>>>>>>> origin/multiserver2
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -116,7 +123,11 @@ func (rwh *RaceWeekendHandler) sessionConfiguration(w http.ResponseWriter, r *ht
 	raceWeekendSessionOpts, err := rwh.raceWeekendManager.BuildRaceWeekendSessionOpts(r)
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("couldn't build race weekend session")
+=======
+		logrus.Errorf("couldn't build race weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -128,7 +139,11 @@ func (rwh *RaceWeekendHandler) submitSessionConfiguration(w http.ResponseWriter,
 	raceWeekend, session, edited, err := rwh.raceWeekendManager.SaveRaceWeekendSession(r)
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("couldn't build race weekend session")
+=======
+		logrus.Errorf("couldn't build race weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -153,6 +168,7 @@ func (rwh *RaceWeekendHandler) submitSessionConfiguration(w http.ResponseWriter,
 		// end the race creation flow
 		http.Redirect(w, r, "/race-weekend/"+raceWeekend.ID.String(), http.StatusFound)
 		return
+<<<<<<< HEAD
 	}
 
 	// add another session
@@ -179,6 +195,19 @@ func (rwh *RaceWeekendHandler) startPracticeSession(w http.ResponseWriter, r *ht
 
 	if err != nil {
 		logrus.WithError(err).Errorf("Could not start Race Weekend practice session")
+=======
+	} else {
+		// add another session
+		http.Redirect(w, r, "/race-weekend/"+raceWeekend.ID.String()+"/session", http.StatusFound)
+	}
+}
+
+func (rwh *RaceWeekendHandler) startSession(w http.ResponseWriter, r *http.Request) {
+	err := rwh.raceWeekendManager.StartSession(chi.URLParam(r, "raceWeekendID"), chi.URLParam(r, "sessionID"))
+
+	if err != nil {
+		logrus.Errorf("Could not start Race Weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 
 		AddErrorFlash(w, r, "Couldn't start the Session")
 	} else {
@@ -193,7 +222,11 @@ func (rwh *RaceWeekendHandler) restartSession(w http.ResponseWriter, r *http.Req
 	err := rwh.raceWeekendManager.RestartSession(chi.URLParam(r, "raceWeekendID"), chi.URLParam(r, "sessionID"))
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("Could not restart Race Weekend session")
+=======
+		logrus.Errorf("Could not restart Race Weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 
 		AddErrorFlash(w, r, "Couldn't restart the Session")
 	} else {
@@ -208,7 +241,11 @@ func (rwh *RaceWeekendHandler) cancelSession(w http.ResponseWriter, r *http.Requ
 	err := rwh.raceWeekendManager.CancelSession(chi.URLParam(r, "raceWeekendID"), chi.URLParam(r, "sessionID"))
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("Could not cancel Race Weekend session")
+=======
+		logrus.Errorf("Could not cancel Race Weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 
 		AddErrorFlash(w, r, "Couldn't cancel the Session")
 	} else {
@@ -223,7 +260,11 @@ func (rwh *RaceWeekendHandler) deleteSession(w http.ResponseWriter, r *http.Requ
 	err := rwh.raceWeekendManager.DeleteSession(chi.URLParam(r, "raceWeekendID"), chi.URLParam(r, "sessionID"))
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("Could not delete Race Weekend session")
+=======
+		logrus.Errorf("Could not delete Race Weekend session, err: %s", err)
+>>>>>>> origin/multiserver2
 
 		AddErrorFlash(w, r, "Couldn't delete the Session")
 	} else {
@@ -249,7 +290,11 @@ func (rwh *RaceWeekendHandler) importSessionResults(w http.ResponseWriter, r *ht
 		err := rwh.raceWeekendManager.ImportSession(raceWeekendID, sessionID, r)
 
 		if err != nil {
+<<<<<<< HEAD
 			logrus.WithError(err).Errorf("Could not import race weekend session")
+=======
+			logrus.Errorf("Could not import race weekend session, error: %s", err)
+>>>>>>> origin/multiserver2
 			AddErrorFlash(w, r, "Could not import race weekend session files")
 		} else {
 			AddFlash(w, r, "Successfully imported session files!")
@@ -261,7 +306,11 @@ func (rwh *RaceWeekendHandler) importSessionResults(w http.ResponseWriter, r *ht
 	session, results, err := rwh.raceWeekendManager.ListAvailableResultsFilesForSession(raceWeekendID, sessionID)
 
 	if err != nil {
+<<<<<<< HEAD
 		logrus.WithError(err).Errorf("Couldn't load session files")
+=======
+		logrus.Errorf("Couldn't load session files, err: %s", err)
+>>>>>>> origin/multiserver2
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -278,10 +327,15 @@ type raceWeekendFilterTemplateVars struct {
 
 	RaceWeekend                 *RaceWeekend
 	ParentSession, ChildSession *RaceWeekendSession
+<<<<<<< HEAD
 	ResultsAvailableForSorting  []SessionResults
 	Filter                      *RaceWeekendSessionToSessionFilter
 	AvailableSorters            []RaceWeekendEntryListSorterDescription
 	ParentSessionResults        []*RaceWeekendSessionEntrant
+=======
+	Filter                      *RaceWeekendSessionToSessionFilter
+	AvailableSorters            []RaceWeekendEntryListSorterDescription
+>>>>>>> origin/multiserver2
 }
 
 func (rwh *RaceWeekendHandler) manageFilters(w http.ResponseWriter, r *http.Request) {
@@ -305,6 +359,7 @@ func (rwh *RaceWeekendHandler) manageFilters(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+<<<<<<< HEAD
 	sessionResults, err := rwh.raceWeekendManager.ListAvailableResultsFilesForSorting(raceWeekend, childSession)
 
 	if err != nil {
@@ -327,6 +382,14 @@ func (rwh *RaceWeekendHandler) manageFilters(w http.ResponseWriter, r *http.Requ
 		Filter:                     filter,
 		AvailableSorters:           RaceWeekendEntryListSorters,
 		ParentSessionResults:       parentSessionResults,
+=======
+	rwh.viewRenderer.MustLoadPartial(w, r, "race-weekend/popups/manage-filters.html", &raceWeekendFilterTemplateVars{
+		RaceWeekend:      raceWeekend,
+		ParentSession:    parentSession,
+		ChildSession:     childSession,
+		Filter:           filter,
+		AvailableSorters: RaceWeekendEntryListSorters,
+>>>>>>> origin/multiserver2
 	})
 }
 
@@ -342,8 +405,11 @@ func (rwh *RaceWeekendHandler) gridPreview(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+<<<<<<< HEAD
 	filter.IsPreview = true
 
+=======
+>>>>>>> origin/multiserver2
 	previewResponse, err := rwh.raceWeekendManager.PreviewGrid(raceWeekendID, parentSessionID, childSessionID, filter)
 
 	if err != nil {
@@ -455,8 +521,11 @@ func (rwh *RaceWeekendHandler) export(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+<<<<<<< HEAD
 	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.json"`, raceWeekend.Name))
 
+=======
+>>>>>>> origin/multiserver2
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	_ = enc.Encode(raceWeekend)
@@ -477,6 +546,7 @@ func (rwh *RaceWeekendHandler) importRaceWeekend(w http.ResponseWriter, r *http.
 
 	rwh.viewRenderer.MustLoadTemplate(w, r, "race-weekend/import-raceweekend.html", nil)
 }
+<<<<<<< HEAD
 
 func (rwh *RaceWeekendHandler) scheduleSession(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
@@ -543,3 +613,5 @@ func (rwh *RaceWeekendHandler) removeSessionSchedule(w http.ResponseWriter, r *h
 
 	http.Redirect(w, r, r.Referer(), http.StatusFound)
 }
+=======
+>>>>>>> origin/multiserver2
