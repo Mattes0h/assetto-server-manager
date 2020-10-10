@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -105,6 +106,7 @@ type ContentManagerWrapper struct {
 	trackManager *TrackManager
 
 	sessionInfo udp.SessionInfo
+	logger      cmwSessionLogger
 
 	reverseProxy *httputil.ReverseProxy
 	serverConfig ServerConfig
@@ -267,8 +269,13 @@ func (cmw *ContentManagerWrapper) setDescriptionText(event RaceEvent) error {
 	return nil
 }
 
-func (cmw *ContentManagerWrapper) Start(servePort int, event RaceEvent) error {
+type cmwSessionLogger interface {
+	Logs() string
+}
+
+func (cmw *ContentManagerWrapper) Start(servePort int, event RaceEvent, logger cmwSessionLogger) error {
 	cmw.mutex.Lock()
+	cmw.logger = logger
 
 	logrus.Infof("Starting content manager wrapper server on port %d", servePort)
 
@@ -476,26 +483,26 @@ func (cmw *ContentManagerWrapper) buildContentManagerDetails(guid string) (*Cont
 	sessionInfo.Country = []string{geoInfo.CountryName, geoInfo.CountryCode}
 
 	var description string
-	var championshipID uuid.UUID
+	/*	var championshipID uuid.UUID
 
-	if champ, ok := cmw.event.(*ActiveChampionship); ok {
-		championshipID = champ.ChampionshipID
-	}
-
-	if raceWeekend, ok := cmw.event.(*ActiveRaceWeekend); ok {
-		championshipID = raceWeekend.ChampionshipID
-	}
-
-	if championshipID != uuid.Nil {
-		championship, err := cmw.store.LoadChampionship(championshipID.String())
-
-		if err == nil {
-			description = championship.GetPlayerSummary(guid) + "\n\n"
-		} else {
-			logrus.WithError(err).Warn("can't load championship info")
+		if champ, ok := cmw.event.(*ActiveChampionship); ok {
+			championshipID = champ.ChampionshipID
 		}
-	}
 
+		if raceWeekend, ok := cmw.event.(*ActiveRaceWeekend); ok {
+			championshipID = raceWeekend.ChampionshipID
+		}
+
+		if championshipID != uuid.Nil {
+			championship, err := cmw.store.LoadChampionship(championshipID.String())
+
+			if err == nil {
+				description = championship.GetPlayerSummary(guid) + "\n\n"
+			} else {
+				logrus.WithError(err).Warn("can't load championship info")
+			}
+		}
+	*/
 	description += cmw.description
 
 	// @TODO ContentManagerWrapperContentRequiresPassword from config_ini.go
@@ -506,6 +513,8 @@ func (cmw *ContentManagerWrapper) buildContentManagerDetails(guid string) (*Cont
 		cmContent = &CMContent{}
 	}
 
+	windSpeed, windDirection := cmw.getWindDetailsFromSessionLogs()
+
 	return &ContentManagerWrapperData{
 		ACHTTPSessionInfo: *sessionInfo,
 		Players:           *players,
@@ -514,8 +523,8 @@ func (cmw *ContentManagerWrapper) buildContentManagerDetails(guid string) (*Cont
 
 		AmbientTemperature: live.AmbientTemp,
 		RoadTemperature:    live.RoadTemp,
-		WindDirection:      race.WindBaseDirection,
-		WindSpeed:          race.WindBaseSpeedMin,
+		WindDirection:      windDirection,
+		WindSpeed:          windSpeed,
 		CurrentWeatherID:   getSolWeatherPrettyName(live.WeatherGraphics),
 		Grip:               race.DynamicTrack.SessionStart,
 		GripTransfer:       race.DynamicTrack.SessionTransfer,
@@ -544,6 +553,30 @@ func (cmw *ContentManagerWrapper) buildContentManagerDetails(guid string) (*Cont
 		Frequency: global.ClientSendIntervalInHertz,
 		Until:     time.Now().Add(time.Second * time.Duration(sessionInfo.Timeleft)).Unix(),
 	}, nil
+}
+
+var serverLogsWindRegex = regexp.MustCompile(`Wind update\. Speed: (\d+) Direction: (\d+)`)
+
+func (cmw *ContentManagerWrapper) getWindDetailsFromSessionLogs() (speed int, direction int) {
+	if cmw.logger == nil {
+		return 0, 0
+	}
+
+	logs := cmw.logger.Logs()
+
+	matches := serverLogsWindRegex.FindAllStringSubmatch(logs, -1)
+
+	if len(matches) < 1 {
+		return 0, 0
+	}
+
+	match := matches[len(matches)-1]
+
+	if len(match) < 3 {
+		return 0, 0
+	}
+
+	return formValueAsInt(match[1]), formValueAsInt(match[2])
 }
 
 func getSolWeatherPrettyName(weatherName string) string {

@@ -22,9 +22,9 @@ func DefaultRealPenaltyConfig() *RealPenaltyConfig {
 
 // each of these is a separate ini file
 type RealPenaltyConfig struct {
-	RealPenaltyAppConfig  RealPenaltyAppConfig
-	RealPenaltySettings   RealPenaltySettings
-	RealPenaltyACSettings RealPenaltyACSettings
+	RealPenaltyAppConfig  RealPenaltyAppConfig  `show:"contents"`
+	RealPenaltySettings   RealPenaltySettings   `show:"contents"`
+	RealPenaltyACSettings RealPenaltyACSettings `show:"contents"`
 }
 
 func (rpc *RealPenaltyConfig) Write() error {
@@ -106,7 +106,7 @@ type RealPenaltyConfigGeneral struct {
 
 	UDPPort     int    `ini:"UDP_PORT" show:"-" help:"Listening UDP port - Set the same port (without IP) of cfg of the server, UDP_PLUGIN_ADDRESS "`
 	UDPResponse string `ini:"UDP_RESPONSE" show:"-" help:"Destination IP and UDP port for response - Set the same port in the cfg of the AC server, UDP_PLUGIN_LOCAL_PORT"`
-	AppTCPPort  int    `ini:"APP_TCP_PORT" show:"open" help:"Listening UDP port from AC app (to open in firewall/router). Must be one of 53000, 53001, 53002 to 530020, or the port of cfg AC server, HTTP_PORT + 27. The app will try all these ports on the ac server's ip address (until the right connection is found)"`
+	AppTCPPort  int    `ini:"APP_TCP_PORT" show:"open" help:"Listening UDP port from AC app (to open in firewall/router). Must be one of 53000, 53001, 53002 to 53020, or the port of cfg AC server, HTTP_PORT + 27. The app will try all these ports on the ac server's ip address (until the right connection is found)"`
 
 	AppFile      string `ini:"APP_FILE" show:"-" help:"Path and file names of the app from the plugin package"`
 	ImagesFile   string `ini:"IMAGES_FILE" show:"-" help:"Path and file names of the images from the plugin package"`
@@ -524,8 +524,8 @@ type RealPenaltyACSettingsGeneral struct {
 }
 
 type RealPenaltyACSettingsApp struct {
-	Mandatory      string `ini:"MANDATORY" help:"List of permitted versions (separated by a semicolon). Set to blank if the app is not mandatory. True for any version."`
-	CheckFrequency int    `ini:"CHECK_FREQUENCY" help:"Frequency (seconds) for app check"`
+	Mandatory      boolString `ini:"MANDATORY" help:"on = Real Penalty app is mandatory, off = Real Penalty app is not mandatory"`
+	CheckFrequency int        `ini:"CHECK_FREQUENCY" help:"Frequency (seconds) for app check"`
 }
 
 type RealPenaltyACSettingsSol struct {
@@ -543,11 +543,11 @@ type RealPenaltyACSettingsSafetyCar struct {
 }
 
 type RealPenaltyACSettingsNoPenalty struct {
-	GUIDs string `ini:"GUIDs" help:"List of Steam GUIDs (separated by a semicolon) that can connect to the server without the app and sol (for example 'Race Direction' or for 'Live')"`
+	GUIDs string `ini:"GUIDs" name:"GUIDs" help:"List of Steam GUIDs (separated by a semicolon) that can connect to the server without the app and sol (for example 'Race Direction' or for 'Live')"`
 }
 
 type RealPenaltyACSettingsAdmin struct {
-	GUIDs string `ini:"GUIDs" help:"List of Steam GUIDs (separated by a semicolon) that can send commands to the server via chat"`
+	GUIDs string `ini:"GUIDs" name:"GUIDs" help:"List of Steam GUIDs (separated by a semicolon) that can send commands to the server via chat"`
 }
 
 type RealPenaltyACSettingsHelicorsa struct {

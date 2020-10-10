@@ -1,14 +1,46 @@
+v1.7.8
+------
+
+Fixed:
+
+* Added a check for "Session Openness" when starting events. If the first event of a session is set to "No Join", Server Manager will correct it to "Free Join" (for Practice/Qualifying) and "Free join until 20 seconds to the Green Light" for Race sessions. This fixes an issue where the acServer will constantly loop sessions if the first session is not joinable.
+
+v1.7.7
+------
+
+Fixed:
+
+* Sign Up Forms should now work as intended for non-ACSR enabled events.
+
+---
+
 v1.7.6
 ------
 
 Added:
 
+* Added the ability to gate ACSR exported events based on ACSR skill and safety ratings!
+* Added a chat box to Live Timings, showing the in-game chat and messages broadcast from the server!
 * Added a "combine results" button to the results index page, allowing you to manually combine any results (you should probably only combine results of the same type and track, but there is no hard restriction in place)
+* Added functionality that aims to persist results information for sessions that do not complete fully. This works by sending a "Next Session" message to the acServer to tell it to write out results files for the current session. This feature is disabled by default - look for the `persist_mid_session_results` option in the config.example.yml included with this release.
+* Server Logs and Audit Logs now display using the full width of the browser window.
+* Added the user group to the body class. This should allow you to customise the CSS for different user groups.
+* Race Details popup now displays the time of day calculated from the sun angle (if Sol is disabled)
 
 Fixed:
 
 * Fixes an issue where the car name would be incorrectly set in Race Control for drivers who have swapped cars.
 * Fixes an issue where kicked drivers could become linked to the $#@@!$kicked GUID that AC assigns to kicked drivers in results files. This issue could affect ACSR, penalties, page renders and more.
+* Fixes an issue in Time Attack events where drivers connecting in different slots in multiple sessions would result in broken results files. We strongly recommend using locked entry lists in conjunction with Time Attack events.
+* Fixes an issue where Wind settings were not written out correctly to the server configuration file, resulting in 0 wind speed/direction. Please note that you will need to re-edit any races to add wind settings to them.
+* The race details popup now shows details about a second race (if configured).
+* Fixes pitbox numbers being incorrect when initially setting up an event.
+* Improved handling of results files with non-standard names.
+* Time Attack events should now be moved to the top of the results list each time they are updated.
+* Read users are no longer able to access the UI controls for the Manually Choose Drivers option in Race Weekends.
+* Improved some help text on the Real Penalty options page.
+* Championship and Race Weekend looping practice sessions now force the Result Screen Time to 30 seconds, rather than using the event's Result Screen Time.
+* Fixes an issue where lua plugins running concurrently may cause a server crash.
 
 ---
 

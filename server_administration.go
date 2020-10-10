@@ -135,7 +135,7 @@ func (sah *ServerAdministrationHandler) motd(w http.ResponseWriter, r *http.Requ
 type serverOptionsTemplateVars struct {
 	BaseTemplateVars
 
-	Form *Form
+	Form template.HTML
 }
 
 func (sah *ServerAdministrationHandler) options(w http.ResponseWriter, r *http.Request) {
@@ -143,12 +143,12 @@ func (sah *ServerAdministrationHandler) options(w http.ResponseWriter, r *http.R
 
 	if err != nil {
 		logrus.WithError(err).Errorf("couldn't load server options")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
-	form := NewForm(serverOpts, nil, "", AccountFromRequest(r).Name == "admin")
-
 	if r.Method == http.MethodPost {
-		err := form.Submit(r)
+		err := DecodeFormData(serverOpts, r)
 
 		if err != nil {
 			logrus.WithError(err).Errorf("couldn't submit form")
@@ -171,6 +171,14 @@ func (sah *ServerAdministrationHandler) options(w http.ResponseWriter, r *http.R
 		sah.acsrClient.AccountID = serverOpts.ACSRAccountID
 		sah.acsrClient.APIKey = serverOpts.ACSRAPIKey
 		sah.acsrClient.Enabled = serverOpts.EnableACSR
+	}
+
+	form, err := EncodeFormData(serverOpts, r)
+
+	if err != nil {
+		logrus.WithError(err).Errorf("Couldn't encode form data")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	sah.viewRenderer.MustLoadTemplate(w, r, "server/options.html", &serverOptionsTemplateVars{
@@ -261,7 +269,9 @@ func (sah *ServerAdministrationHandler) autoFillEntrantDelete(w http.ResponseWri
 }
 
 func (sah *ServerAdministrationHandler) logs(w http.ResponseWriter, r *http.Request) {
-	sah.viewRenderer.MustLoadTemplate(w, r, "server/logs.html", nil)
+	sah.viewRenderer.MustLoadTemplate(w, r, "server/logs.html", &BaseTemplateVars{
+		WideContainer: true,
+	})
 }
 
 type logData struct {

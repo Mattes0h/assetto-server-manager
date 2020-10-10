@@ -593,6 +593,7 @@ func (rwm *RaceWeekendManager) StartSession(raceWeekendID string, raceWeekendSes
 		}
 
 		session.RaceConfig.LoopMode = 1
+		session.RaceConfig.ResultScreenTime = 30
 
 		raceWeekendRaceEvent.IsPracticeSession = true
 		raceWeekendRaceEvent.RaceConfig = session.RaceConfig
@@ -1257,7 +1258,7 @@ func (rwm *RaceWeekendManager) ScheduleSession(raceWeekendID, sessionID string, 
 }
 
 func raceWeekendEventSchedulePlugin(raceWeekend *RaceWeekend, raceWeekendSession *RaceWeekendSession) error {
-	p := &LuaPlugin{}
+	p := NewLuaPlugin()
 
 	newRaceWeekendSession, newRaceWeekend := NewRaceWeekendSession(), NewRaceWeekend()
 
